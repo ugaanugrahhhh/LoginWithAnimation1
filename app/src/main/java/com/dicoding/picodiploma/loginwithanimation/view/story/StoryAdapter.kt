@@ -2,38 +2,49 @@ package com.dicoding.picodiploma.loginwithanimation.view.story
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dicoding.picodiploma.loginwithanimation.databinding.ItemStoryBinding
 import com.dicoding.picodiploma.loginwithanimation.response.ListStoryItem
 
-class StoryAdapter(private var listStory: List<ListStoryItem>) :
-    RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
+class StoryAdapter(private val onStoryClick: (ListStoryItem) -> Unit) :
+    ListAdapter<ListStoryItem, StoryAdapter.MyViewHolder>(DIFF_CALLBACK) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
+    class MyViewHolder(private val binding: ItemStoryBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(listStory: ListStoryItem, onStoryClick: (ListStoryItem) -> Unit) {
+            with(binding) {
+                Glide.with(itemView)
+                    .load(listStory.photoUrl)
+                    .into(ivItemPhoto)
+                tvItemName.text = listStory.name
+                tvItemDesc.text = listStory.description
+            }
+            itemView.setOnClickListener { onStoryClick(listStory) }
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val binding = ItemStoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return StoryViewHolder(binding)
+        return MyViewHolder(binding)
     }
 
-    fun updateData(newListStory: List<ListStoryItem>) {
-        this.listStory = newListStory
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        val story = getItem(position)
+        holder.bind(story, onStoryClick)
     }
 
-    override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
-        holder.bind(listStory[position])
-    }
+    companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListStoryItem>() {
+            override fun areItemsTheSame(oldItem: ListStoryItem, newItem: ListStoryItem): Boolean {
+                return oldItem.id == newItem.id
+            }
 
-    override fun getItemCount(): Int {
-        return listStory.size
-    }
-
-    inner class StoryViewHolder(private val binding: ItemStoryBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: ListStoryItem) {
-            Glide.with(binding.root.context)
-                .load(item.photoUrl)
-                .into(binding.ivItemPhoto)
-            binding.tvItemName.text = item.name
-            binding.tvItemDesc.text = item.description
+            override fun areContentsTheSame(oldItem: ListStoryItem, newItem: ListStoryItem): Boolean {
+                return oldItem == newItem
+            }
         }
     }
 }

@@ -19,7 +19,7 @@ import com.dicoding.picodiploma.loginwithanimation.view.signup.SignupActivity
 class WelcomeActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<MainViewModel> {
-        ViewModelFactory.getInstance(this)
+        ViewModelFactory.getInstance()
     }
     private lateinit var binding: ActivityWelcomeBinding
 

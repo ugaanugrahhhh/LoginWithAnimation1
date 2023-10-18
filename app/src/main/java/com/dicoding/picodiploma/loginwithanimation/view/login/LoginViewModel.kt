@@ -12,8 +12,8 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(private val repository: UserRepository) : ViewModel() {
 
-    private val _loginResponse = MutableLiveData<DetailResponse>()
-    val loginResponse: LiveData<DetailResponse> = _loginResponse
+//    private val _login = MutableLiveData<DetailResponse>()
+    val loginUser: LiveData<LoginResponse> = repository.loginUser
 
 
     fun saveSession(user: UserModel) {
@@ -21,7 +21,7 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
             repository.saveSession(user)
         }
     }
-    suspend fun login(email: String, password: String): LoginResponse {
-        return repository.login(email, password)
+   fun login(email: String, password: String) {
+       repository.postLogin(email, password)
     }
 }

@@ -20,7 +20,7 @@ import com.dicoding.picodiploma.loginwithanimation.view.story.ListStoryActivity
 
 class LoginActivity : AppCompatActivity() {
     private val viewModel by viewModels<LoginViewModel> {
-        ViewModelFactory.getInstance(this)
+        ViewModelFactory.getInstance()
     }
     private lateinit var binding: ActivityLoginBinding
     private lateinit var customEditText: CustomEditText
@@ -52,13 +52,21 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupAction() {
         binding.loginButton.setOnClickListener {
-            val email = binding.edLoginEmail.text.toString()
-            viewModel.saveSession(UserModel(email, "sample_token"))
+            binding.edLoginEmail.text.toString()
+//            viewModel.saveSession(UserModel(email, token))
+            viewModel.login(
+                binding.edLoginEmail.text.toString(),
+                binding.edLoginPassword.text.toString()
+            )
+
+            viewModel.loginUser.observe(this@LoginActivity) { user ->
+                viewModel.saveSession(UserModel(user.loginResult?.name.toString(),user.loginResult?.token.toString()))
+            }
             AlertDialog.Builder(this).apply {
                 setTitle("Yeah!")
                 setMessage("Anda berhasil login. Sudah tidak sabar untuk belajar ya?")
                 setPositiveButton("Lanjut") { _, _ ->
-                    val intent = Intent(context, ListStoryActivity::class.java)
+                    val intent = Intent(this@LoginActivity, ListStoryActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                     startActivity(intent)
                     finish()

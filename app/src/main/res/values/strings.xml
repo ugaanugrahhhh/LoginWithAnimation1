@@ -24,5 +24,6 @@
     <string name="logout">Keluar</string>
     <string name="action_logout">Logout</string>
     <string name="action_add_stories">Add Story</string>
+    <string name="empty_image_warning">Silakan masukkan berkas gambar terlebih dahulu</string>
 
 </resources>

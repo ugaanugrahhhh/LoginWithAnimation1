@@ -1,26 +1,22 @@
 package com.dicoding.picodiploma.loginwithanimation.view.story
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.dicoding.picodiploma.loginwithanimation.data.StoryItem
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
 import com.dicoding.picodiploma.loginwithanimation.data.pref.dataStore
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityDetailStoryBinding
 import com.dicoding.picodiploma.loginwithanimation.view.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.view.main.MainViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 @OptIn(DelicateCoroutinesApi::class)
 class DetailStoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailStoryBinding
     private val viewModel by viewModels<MainViewModel> {
-        ViewModelFactory.getInstance(this)
+        ViewModelFactory.getInstance()
     }
     private val userPreference: UserPreference by lazy {
         UserPreference.getInstance(dataStore)
@@ -31,42 +27,26 @@ class DetailStoryActivity : AppCompatActivity() {
         binding = ActivityDetailStoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        GlobalScope.launch {
-            val token = getTokenFromUserPreference()
-            val storyId = intent.getIntExtra(EXTRA_STORY_ID, 0)
-            viewModel.getDetail(token, storyId)
-            viewModel.detailResponse.observe(this@DetailStoryActivity) { response ->
-                if (response != null) {
-                    val story = response.message // Replace this with your actual data model
-                    val storyItem = StoryItem
-                } else {
-                    // Handle the case when the response is null
-                }
-            }
-        }
-    }
+        id = intent.getStringExtra(ID)?: ""
+        name = intent.getStringExtra(NAME)?: ""
+        description = intent.getStringExtra(DESCRIPTION)?: ""
+        picture = intent.getStringExtra(PICTURE)?: ""
 
-    private fun updateUI(story: StoryItem) {
-        binding.apply {
-            tvDetailName.text = story.name
-            tvDetailDescription.text = story.description
+        binding.tvDetailName.text = name
+        binding.tvDetailDescription.text = description
 
-            Glide.with(binding.root)
-                .load(story.photoUrl)
-                .into(ivDetailPhoto)
-        }
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private suspend fun getTokenFromUserPreference(): String {
-        var token = ""
-        userPreference.getSession().collect { user ->
-            token = user.token
-        }
-        return token
+        Glide.with(this).load(picture).into(binding.ivDetailPhoto)
     }
 
     companion object {
-        const val EXTRA_STORY_ID = "extra_story_id"
+        const val ID = "ID"
+        const val NAME = "NAME"
+        const val DESCRIPTION = "DESCRIPTION"
+        const val PICTURE = "PICTURE"
+
+        var id: String = ""
+        var name: String = ""
+        var description: String? = null
+        var picture: String? = null
     }
 }
